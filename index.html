@@ -6,7 +6,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;600&display=swap">
 <style>
-/* Layout: phone-first single column. Now-card, then one 24 h gauge, then the week strip; settings folded at the bottom. Dark only, by choice (night use, low power). */
+/* Layout: phone-first single column. Now-card, then two 24 h clocks side by side (wall clock left, body clock right), then the week strip; settings folded at the bottom. Dark only, by choice (night use, low power). */
 :root{--page:#0E1320;--panel:#161D2E;--track:#1D2538;--line:#2A3349;--text:#E8E6DF;--dim:#9AA3B5;
 --night:#2B3F73;--sharp:#F2B84B;--dip:#C98A5A;--wind:#A88A3A;--gate:#8E7CC3;--danger:#E5484D;
 --steel:#A9B3C4;--steel2:#7C8798;--steel3:#5D6676;--sleep:#E8E6DF;--seek:#FFE9A8;--avoid:#5A6478;
@@ -26,7 +26,7 @@ h1{font:600 22px var(--gauge);letter-spacing:.08em;text-transform:uppercase;marg
 svg{display:block;width:100%;height:auto;max-width:100%;cursor:pointer}
 svg text{font-family:var(--gauge);fill:var(--text)}
 #bh.sweep,#wh.sweep{transition:transform .6s cubic-bezier(.3,.8,.3,1)}
-#bh,#wh{transform-origin:200px 200px}
+#wh{transform-origin:100px 120px}#bh{transform-origin:300px 120px}
 .scrub{display:flex;gap:10px;align-items:center}
 .scrub input{flex:1;min-width:0;accent-color:var(--sharp);height:44px;margin:0}
 button,select,input[type=number]{font:600 14px var(--body);color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;min-height:44px;padding:0 12px}
@@ -59,32 +59,31 @@ footer{font-size:12px;color:var(--dim);max-width:60ch}
   <header><h1>Body Clock</h1><span class="week" id="week"></span></header>
   <p class="example" id="example" hidden>Example setup, not your real schedule yet. Set your shift under Settings below.</p>
   <section class="card" id="card"><h2 id="head"></h2><p id="sub"></p><ul id="notes"></ul></section>
-  <svg id="dial" viewBox="0 0 400 400" role="img" aria-label="24 hour body clock dial">
+  <svg id="dial" viewBox="0 0 400 300" role="img" aria-label="Wall clock and body clock">
+    <text x="100" y="16" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="2">WALL CLOCK</text>
+    <text x="300" y="16" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="2" style="fill:#F2B84B">BODY CLOCK</text>
     <g id="rings"></g>
-    <g id="wh"><line x1="200" y1="88" x2="200" y2="8" stroke="#E8E6DF" stroke-width="2.5" stroke-linecap="round"/></g>
-    <g id="bh"><line x1="200" y1="88" x2="200" y2="14" stroke="#F2B84B" stroke-width="3" stroke-linecap="round"/><circle cx="200" cy="12" r="5" fill="#F2B84B"/></g>
-    <text x="200" y="172" text-anchor="middle" font-size="12" letter-spacing="2" style="fill:#9AA3B5">WALL TIME</text>
-    <text id="cw" x="200" y="212" text-anchor="middle" font-size="46" font-weight="600"></text>
-    <text id="cb" x="200" y="238" text-anchor="middle" font-size="20" font-weight="600" style="fill:#F2B84B"></text>
+    <g id="wh"><line x1="100" y1="120" x2="100" y2="58" stroke="#E8E6DF" stroke-width="3.5" stroke-linecap="round"/></g>
+    <g id="bh"><line x1="300" y1="120" x2="300" y2="58" stroke="#F2B84B" stroke-width="3.5" stroke-linecap="round"/></g>
+    <circle cx="100" cy="120" r="5" fill="#E8E6DF"/><circle cx="300" cy="120" r="5" fill="#F2B84B"/>
+    <text id="cw" x="100" y="256" text-anchor="middle" font-size="44" font-weight="600"></text>
+    <text id="cb" x="300" y="256" text-anchor="middle" font-size="44" font-weight="600" style="fill:#F2B84B"></text>
+    <text id="lag" x="200" y="290" text-anchor="middle" font-size="18" font-weight="600" letter-spacing="1.5" style="fill:#9AA3B5"></text>
   </svg>
   <div class="scrub"><input id="scrub" type="range" min="0" max="1430" step="10" aria-label="Look at another time of this day"><button id="bNow">Now</button></div>
   <h3>Body catching up this week</h3>
   <div class="days" id="days"></div>
   <p class="plan" id="plan"></p>
   <ul class="legend">
-    <li><i style="background:var(--steel)"></i>Duty (ready, shift, extra)</li>
-    <li><i style="background:var(--danger)"></i>Danger hours on duty</li>
+    <li><i style="background:var(--steel)"></i>Wall clock: duty</li>
+    <li><i style="background:var(--sleep);height:4px"></i>Wall clock: sleep</li>
+    <li><i style="background:var(--danger)"></i>Wall clock: danger hours</li>
     <li><i style="background:var(--night)"></i>Body night</li>
     <li><i style="background:var(--sharp)"></i>Sharp zone</li>
     <li><i style="background:var(--dip)"></i>Afternoon dip</li>
     <li><i style="background:var(--wind)"></i>Second wind</li>
     <li><i style="background:var(--gate)"></i>Sleep gate</li>
-    <li><i style="background:var(--sleep)"></i>Sleep window</li>
-    <li><i style="background:var(--seek);height:4px"></i>Seek bright light</li>
-    <li><i style="background:repeating-linear-gradient(90deg,var(--avoid) 0 3px,transparent 3px 6px)"></i>Keep light low</li>
     <li><i class="dot" style="background:var(--page);border:2px solid var(--sharp);box-sizing:border-box"></i>Body low point</li>
-    <li><i class="dot" style="background:var(--dip)">T</i>Last tea or coffee</li>
-    <li><i class="dot" style="background:var(--gate)">N</i>Nap slot (20 min)</li>
   </ul>
   <details id="setbox">
     <summary>Settings</summary>
@@ -149,21 +148,19 @@ function analyse(T){
 
 /* ---------- drawing ---------- */
 const fmt=h=>{let m=Math.round(mod(h,24)*60)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
-const pt=(r,h)=>{const a=h/24*2*Math.PI;return[(200+r*Math.sin(a)).toFixed(2),(200-r*Math.cos(a)).toFixed(2)]};
-function arc(r,a,b,col,w,dash){if(b-a>=23.99)return`<circle cx="200" cy="200" r="${r}" fill="none" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:""}/>`;
-  const p=pt(r,a),q=pt(r,b);return`<path d="M${p[0]} ${p[1]}A${r} ${r} 0 ${b-a>12?1:0} 1 ${q[0]} ${q[1]}" fill="none" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:""}/>`}
-function drawRings(A){const D0=A.di*24;let h="";
-  const put=(list,r,col,w,dash)=>list.forEach(x=>{const a=Math.max(x[0],D0)-D0,b=Math.min(x[1],D0+24)-D0;if(b-a>.01)h+=arc(r,a,b,col,w,dash)});
-  const mark=(T,r,fill,ch,stroke)=>{if(T<D0||T>=D0+24)return;const p=pt(r,T-D0);h+=`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="${fill}"${stroke?` stroke="${stroke}" stroke-width="2.5"`:""}/>`;if(ch)h+=`<text x="${p[0]}" y="${(+p[1]+3.5).toFixed(2)}" text-anchor="middle" font-size="10" font-weight="600" style="fill:#0E1320;font-family:Inter,system-ui,sans-serif">${ch}</text>`};
-  h+=arc(176,0,24,"#1D2538",14)+arc(152,0,24,"#1D2538",22)+arc(124,0,24,"#161D2E",10);
-  put(A.duties.map(d=>[d.a,d.p]),176,"#5D6676",14);put(A.duties.map(d=>[d.p,d.q]),176,"#A9B3C4",14);put(A.duties.map(d=>[d.q,d.b]),176,"#7C8798",14);
-  put(A.danger,190,"#E5484D",5);
-  put(A.zones.night,152,"#2B3F73",22);put(A.zones.sharp,152,"#F2B84B",22);put(A.zones.dip,152,"#C98A5A",22);put(A.zones.wind,152,"#A88A3A",22);put(A.zones.gate,152,"#8E7CC3",22);
-  put(A.sleeps,124,"#E8E6DF",10);put(A.seek,124,"#FFE9A8",4);put(A.avoid,124,"#5A6478",6,"3 3");
-  for(let k=0;k<24;k++){const p=pt(k%3?106:103,k),q=pt(110,k);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#5D6676" stroke-width="${k%3?1:2}"/>`;
-    if(k%3===0){const n=pt(92,k);h+=`<text x="${n[0]}" y="${(+n[1]+5).toFixed(2)}" text-anchor="middle" font-size="15" style="fill:#9AA3B5">${String(k).padStart(2,"0")}</text>`}}
-  A.tea.forEach(t=>mark(t,124,"#C98A5A","T"));A.nap.forEach(t=>mark(t,124,"#8E7CC3","N"));
-  [-1,0,1].forEach(k=>mark(A.di*24+A.L+24*k,152,"#0E1320","","#F2B84B"));
+const CY=120,pt=(cx,r,h)=>{const a=h/24*2*Math.PI;return[(cx+r*Math.sin(a)).toFixed(2),(CY-r*Math.cos(a)).toFixed(2)]};
+function arc(cx,r,a,b,col,w){if(b-a>=23.99)return`<circle cx="${cx}" cy="${CY}" r="${r}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
+  const p=pt(cx,r,a),q=pt(cx,r,b);return`<path d="M${p[0]} ${p[1]}A${r} ${r} 0 ${b-a>12?1:0} 1 ${q[0]} ${q[1]}" fill="none" stroke="${col}" stroke-width="${w}"/>`}
+/* left dial = wall time (duty, sleep, danger). right dial = body time (zones), so intervals are moved back by the lag. */
+function drawRings(A){const D0=A.di*24,lg=A.r.dir*A.r.h;let h="";
+  const put=(cx,list,r,col,w,off)=>list.forEach(x=>{const a=Math.max(x[0]-off,D0)-D0,b=Math.min(x[1]-off,D0+24)-D0;if(b-a>.01)h+=arc(cx,r,a,b,col,w)});
+  [100,300].forEach(cx=>{h+=arc(cx,78,0,24,"#1D2538",16);
+    for(let k=0;k<24;k++){const p=pt(cx,k%6?64:61,k),q=pt(cx,67,k);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#5D6676" stroke-width="${k%6?1:2}"/>`;
+      if(k%6===0){const n=pt(cx,48,k);h+=`<text x="${n[0]}" y="${(+n[1]+5).toFixed(2)}" text-anchor="middle" font-size="14" style="fill:#9AA3B5">${String(k).padStart(2,"0")}</text>`}}});
+  put(100,A.duties.map(d=>[d.a,d.p]),78,"#5D6676",16,0);put(100,A.duties.map(d=>[d.p,d.q]),78,"#A9B3C4",16,0);put(100,A.duties.map(d=>[d.q,d.b]),78,"#7C8798",16,0);
+  put(100,A.sleeps,78,"#E8E6DF",5,0);put(100,A.danger,90,"#E5484D",4,0);
+  [["night","#2B3F73"],["sharp","#F2B84B"],["dip","#C98A5A"],["wind","#A88A3A"],["gate","#8E7CC3"]].forEach(z=>put(300,A.zones[z[0]],78,z[1],16,lg));
+  [-1,0,1].forEach(k=>{const t=A.di*24+A.L+24*k-lg;if(t<D0||t>=D0+24)return;const p=pt(300,78,t-D0);h+=`<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#0E1320" stroke="#F2B84B" stroke-width="2.5"/>`});
   $("rings").innerHTML=h}
 function status(A){const T=A.T,zn=Object.keys(A.zones).find(k=>has(A.zones[k],T)),sl=A.sleeps.find(s=>T>=s[0]&&T<s[1]),onDuty=has(A.dutyI,T);
   let head,subt,cls="";
@@ -175,11 +172,13 @@ function status(A){const T=A.T,zn=Object.keys(A.zones).find(k=>has(A.zones[k],T)
   else if(zn==="wind"){head="Second wind";subt="You feel alert. Still keep to the planned sleep time."}
   else if(zn==="gate"){head="Sleep gate opening";subt="The body is getting ready for sleep. Dim the lights."}
   else{head="Steady hours";subt="Nothing special now. Eat, move, drink water."}
-  const n=[];
-  if(has(A.seek,T))n.push("<b>Bright light now.</b> It helps the body shift.");else if(has(A.avoid,T))n.push("<b>Keep light low now.</b> Dark glasses outside.");
+  const n=[],nx=l=>l.filter(x=>x[1]>T).sort((p,q)=>p[0]-q[0])[0],sk=nx(A.seek),av=nx(A.avoid),np=A.nap.filter(x=>x>T).sort((p,q)=>p-q)[0];
+  if(sk)n.push(sk[0]<=T?"<b>Bright light now</b>, until "+fmt(sk[1])+".":"Bright light <b>"+fmt(sk[0])+" to "+fmt(sk[1])+"</b>.");
+  if(av)n.push(av[0]<=T?"<b>Keep light low now</b>, until "+fmt(av[1])+". Dark glasses outside.":"Keep light low <b>"+fmt(av[0])+" to "+fmt(av[1])+"</b>.");
   const ns=A.sleeps.find(s=>s[0]>T);
   if(ns&&!sl){n.push(T>=ns[0]-6?"<b>No tea or coffee now.</b> Sleep starts "+fmt(ns[0])+".":"Last tea or coffee by <b>"+fmt(ns[0]-6)+"</b>.");n.push("Next sleep <b>"+fmt(ns[0])+" to "+fmt(ns[1])+"</b>.")}
-  n.push(A.r.dir?"Body is <b>"+A.r.h.toFixed(1)+" h "+(A.r.dir>0?"behind":"ahead of")+"</b> this week's shift. In step in about "+(A.r.h/(A.r.dir>0?1.5:1)).toFixed(1)+" days.":"Body is <b>in step</b> with this week's shift.");
+  if(np&&np-T<24)n.push("Nap slot about <b>"+fmt(np)+"</b> (20 min).");
+  n.push(A.r.dir?"Body in step with this shift in about <b>"+(A.r.h/(A.r.dir>0?1.5:1)).toFixed(1)+" days</b>.":"Body is <b>in step</b> with this week's shift.");
   $("head").textContent=head;$("sub").textContent=subt;$("notes").innerHTML=n.map(x=>"<li>"+x+"</li>").join("");$("card").className="card "+cls}
 function drawDays(A){const w=Math.floor(A.di/7)*7,today=dayIdx(realNow());let h=`<button class="nav" id="pw" aria-label="Previous week">&#8249;</button>`;
   for(let j=w;j<w+7;j++){const r=rem(simL(j*24+12),targetL(j)),d=dateOf(j);
@@ -195,7 +194,7 @@ const RM=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").ma
 function render(){const T=viewT===null?absOf(realNow()):viewT,A=analyse(T);
   drawRings(A);status(A);drawDays(A);
   const wd=mod(T,24)/24*360,bd=wd-A.r.dir*A.r.h/24*360,bodyT=T-A.r.dir*A.r.h;
-  $("cw").textContent=fmt(T);$("cb").textContent="BODY "+fmt(bodyT);$("scrub").value=String(Math.round(mod(T,24)*6)*10);
+  $("cw").textContent=fmt(T);$("cb").textContent=fmt(bodyT);$("lag").textContent=A.r.dir?"BODY IS "+A.r.h.toFixed(1)+" H "+(A.r.dir>0?"BEHIND":"AHEAD"):"BODY IS IN STEP";$("scrub").value=String(Math.round(mod(T,24)*6)*10);
   $("wh").style.transform="rotate("+wd+"deg)";
   $("dial").setAttribute("aria-label","Wall time "+fmt(T)+", body time "+fmt(bodyT)+", body low point "+fmt(A.L));
   $("bNow").disabled=viewT===null;$("example").hidden=saved;
@@ -206,7 +205,8 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&viewT===n
 const setHour=h=>{const base=viewT===null?absOf(realNow()):viewT;viewT=Math.floor(base/24)*24+h;render()};
 $("scrub").addEventListener("input",e=>setHour(parseInt(e.target.value,10)/60));
 $("bNow").onclick=()=>{viewT=null;render()};
-$("dial").addEventListener("click",e=>{const b=$("dial").getBoundingClientRect(),x=e.clientX-b.left-b.width/2,y=e.clientY-b.top-b.height/2;setHour(Math.round(mod(Math.atan2(x,-y)/(2*Math.PI)*24,24)*6)/6%24)});
+$("dial").addEventListener("click",e=>{const b=$("dial").getBoundingClientRect(),sx=(e.clientX-b.left)/b.width*400,sy=(e.clientY-b.top)/b.height*300,R=sx>=200;if(sy>215)return;
+  let hr=mod(Math.atan2(sx-(R?300:100),CY-sy)/(2*Math.PI)*24,24);if(R){const A=analyse(viewT===null?absOf(realNow()):viewT);hr=mod(hr+A.r.dir*A.r.h,24)}setHour(Math.round(hr*6)/6%24)});
 $("days").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const base=viewT===null?absOf(realNow()):viewT;
   if(b.id==="pw")viewT=base-168;else if(b.id==="nw")viewT=base+168;else viewT=parseInt(b.dataset.d,10)*24+mod(base,24);render()});
 document.addEventListener("keydown",e=>{if(e.target&&/^(INPUT|SELECT|BUTTON|SUMMARY)$/.test(e.target.tagName))return;const base=viewT===null?absOf(realNow()):viewT;
