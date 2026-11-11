@@ -6,10 +6,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;600&display=swap">
 <style>
-/* Layout: phone-first single column. Now-card, then two 24 h clocks side by side (wall clock left, body clock right), then the week strip; settings folded at the bottom. Dark only, by choice (night use, low power). */
+/* Layout: phone-first single column. Now-card, then two standard 12 h clocks side by side (wall clock left, body clock right), then the week strip; settings folded at the bottom. Dark only, by choice (night use, low power). */
 :root{--page:#0E1320;--panel:#161D2E;--track:#1D2538;--line:#2A3349;--text:#E8E6DF;--dim:#9AA3B5;
 --night:#2B3F73;--sharp:#F2B84B;--dip:#C98A5A;--wind:#A88A3A;--gate:#8E7CC3;--danger:#E5484D;
---steel:#A9B3C4;--steel2:#7C8798;--steel3:#5D6676;--sleep:#E8E6DF;--seek:#FFE9A8;--avoid:#5A6478;
+--steel:#A9B3C4;--steel2:#7C8798;--steel3:#5D6676;--sleep:#6FA3F5;--seek:#FFE9A8;--avoid:#5A6478;
 --gauge:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:dark}
 html,body{margin:0}
 body{background:var(--page);color:var(--text);font:15px/1.5 var(--body);padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -23,10 +23,11 @@ h1{font:600 22px var(--gauge);letter-spacing:.08em;text-transform:uppercase;marg
 .card h2{margin:0;font:600 30px/1.1 var(--gauge);letter-spacing:.02em;text-wrap:balance}
 .card p{margin:0}.card ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:4px;color:var(--dim);font-size:14px}
 .card li b{color:var(--text);font-weight:600}
-svg{display:block;width:100%;height:auto;max-width:100%;cursor:pointer}
+svg{display:block;width:100%;height:auto;max-width:100%}
 svg text{font-family:var(--gauge);fill:var(--text)}
-#bh.sweep,#wh.sweep{transition:transform .6s cubic-bezier(.3,.8,.3,1)}
-#wh{transform-origin:100px 120px}#bh{transform-origin:300px 120px}
+#bhH.sweep{transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+#whH,#whM{transform-origin:100px 120px}#bhH,#bhM{transform-origin:300px 120px}
+.ringnote{margin:0;font-size:13px;color:var(--dim)}
 .scrub{display:flex;gap:10px;align-items:center}
 .scrub input{flex:1;min-width:0;accent-color:var(--sharp);height:44px;margin:0}
 button,select,input[type=number]{font:600 14px var(--body);color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;min-height:44px;padding:0 12px}
@@ -63,20 +64,24 @@ footer{font-size:12px;color:var(--dim);max-width:60ch}
     <text x="100" y="16" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="2">WALL CLOCK</text>
     <text x="300" y="16" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="2" style="fill:#F2B84B">BODY CLOCK</text>
     <g id="rings"></g>
-    <g id="wh"><line x1="100" y1="120" x2="100" y2="58" stroke="#E8E6DF" stroke-width="3.5" stroke-linecap="round"/></g>
-    <g id="bh"><line x1="300" y1="120" x2="300" y2="58" stroke="#F2B84B" stroke-width="3.5" stroke-linecap="round"/></g>
+    <g id="whM"><line x1="100" y1="120" x2="100" y2="60" stroke="#E8E6DF" stroke-width="2.5" stroke-linecap="round"/></g>
+    <g id="whH"><line x1="100" y1="120" x2="100" y2="84" stroke="#E8E6DF" stroke-width="5" stroke-linecap="round"/></g>
+    <g id="bhM"><line x1="300" y1="120" x2="300" y2="60" stroke="#F2B84B" stroke-width="2.5" stroke-linecap="round"/></g>
+    <g id="bhH"><line x1="300" y1="120" x2="300" y2="84" stroke="#F2B84B" stroke-width="5" stroke-linecap="round"/></g>
     <circle cx="100" cy="120" r="5" fill="#E8E6DF"/><circle cx="300" cy="120" r="5" fill="#F2B84B"/>
     <text id="cw" x="100" y="256" text-anchor="middle" font-size="44" font-weight="600"></text>
     <text id="cb" x="300" y="256" text-anchor="middle" font-size="44" font-weight="600" style="fill:#F2B84B"></text>
-    <text id="lag" x="200" y="290" text-anchor="middle" font-size="18" font-weight="600" letter-spacing="1.5" style="fill:#9AA3B5"></text>
+    <text id="slp" x="100" y="286" text-anchor="middle" font-size="17" font-weight="600" letter-spacing="1" style="fill:#6FA3F5"></text>
+    <text id="lag" x="300" y="286" text-anchor="middle" font-size="17" font-weight="600" letter-spacing="1" style="fill:#9AA3B5"></text>
   </svg>
+  <p class="ringnote">Normal 12-hour clocks. The coloured ring shows the next 12 hours, starting from the short hand and going clockwise.</p>
   <div class="scrub"><input id="scrub" type="range" min="0" max="1430" step="10" aria-label="Look at another time of this day"><button id="bNow">Now</button></div>
   <h3>Body catching up this week</h3>
   <div class="days" id="days"></div>
   <p class="plan" id="plan"></p>
   <ul class="legend">
     <li><i style="background:var(--steel)"></i>Wall clock: duty</li>
-    <li><i style="background:var(--sleep);height:4px"></i>Wall clock: sleep</li>
+    <li><i style="background:var(--sleep)"></i>Wall clock: sleep</li>
     <li><i style="background:var(--danger)"></i>Wall clock: danger hours</li>
     <li><i style="background:var(--night)"></i>Body night</li>
     <li><i style="background:var(--sharp)"></i>Sharp zone</li>
@@ -148,19 +153,20 @@ function analyse(T){
 
 /* ---------- drawing ---------- */
 const fmt=h=>{let m=Math.round(mod(h,24)*60)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
-const CY=120,pt=(cx,r,h)=>{const a=h/24*2*Math.PI;return[(cx+r*Math.sin(a)).toFixed(2),(CY-r*Math.cos(a)).toFixed(2)]};
-function arc(cx,r,a,b,col,w){if(b-a>=23.99)return`<circle cx="${cx}" cy="${CY}" r="${r}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
-  const p=pt(cx,r,a),q=pt(cx,r,b);return`<path d="M${p[0]} ${p[1]}A${r} ${r} 0 ${b-a>12?1:0} 1 ${q[0]} ${q[1]}" fill="none" stroke="${col}" stroke-width="${w}"/>`}
-/* left dial = wall time (duty, sleep, danger). right dial = body time (zones), so intervals are moved back by the lag. */
-function drawRings(A){const D0=A.di*24,lg=A.r.dir*A.r.h;let h="";
-  const put=(cx,list,r,col,w,off)=>list.forEach(x=>{const a=Math.max(x[0]-off,D0)-D0,b=Math.min(x[1]-off,D0+24)-D0;if(b-a>.01)h+=arc(cx,r,a,b,col,w)});
-  [100,300].forEach(cx=>{h+=arc(cx,78,0,24,"#1D2538",16);
-    for(let k=0;k<24;k++){const p=pt(cx,k%6?64:61,k),q=pt(cx,67,k);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#5D6676" stroke-width="${k%6?1:2}"/>`;
-      if(k%6===0){const n=pt(cx,48,k);h+=`<text x="${n[0]}" y="${(+n[1]+5).toFixed(2)}" text-anchor="middle" font-size="14" style="fill:#9AA3B5">${String(k).padStart(2,"0")}</text>`}}});
+const CY=120,pt=(cx,r,h)=>{const a=h/12*2*Math.PI;return[(cx+r*Math.sin(a)).toFixed(2),(CY-r*Math.cos(a)).toFixed(2)]};
+function arc(cx,r,a,b,col,w){if(b-a>=11.99)return`<circle cx="${cx}" cy="${CY}" r="${r}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
+  const p=pt(cx,r,a),q=pt(cx,r,b);return`<path d="M${p[0]} ${p[1]}A${r} ${r} 0 ${b-a>6?1:0} 1 ${q[0]} ${q[1]}" fill="none" stroke="${col}" stroke-width="${w}"/>`}
+/* Standard 12 h faces. Each ring shows the next 12 h from the view time. Left = wall time (duty, sleep, danger). Right = body time (zones). Body time is set so the body low point always reads 04:00, like a normal day sleeper. */
+function drawRings(A){const T=A.T,lg=A.L-4;let h="";
+  const put=(cx,list,r,col,w,off)=>list.forEach(x=>{const a=Math.max(x[0],T),b=Math.min(x[1],T+12);if(b-a>.01)h+=arc(cx,r,a-off,b-off,col,w)});
+  [100,300].forEach(cx=>{h+=arc(cx,78,0,12,"#1D2538",16);
+    for(let k=1;k<=12;k++){const p=pt(cx,63,k),q=pt(cx,67,k),n=pt(cx,50,k);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#5D6676" stroke-width="${k%3?1:2}"/><text x="${n[0]}" y="${(+n[1]+5).toFixed(2)}" text-anchor="middle" font-size="${k%3?11:14}" style="fill:#9AA3B5">${k}</text>`}});
   put(100,A.duties.map(d=>[d.a,d.p]),78,"#5D6676",16,0);put(100,A.duties.map(d=>[d.p,d.q]),78,"#A9B3C4",16,0);put(100,A.duties.map(d=>[d.q,d.b]),78,"#7C8798",16,0);
-  put(100,A.sleeps,78,"#E8E6DF",5,0);put(100,A.danger,90,"#E5484D",4,0);
+  put(100,A.sleeps,78,"#6FA3F5",16,0);put(100,A.danger,90,"#E5484D",4,0);
   [["night","#2B3F73"],["sharp","#F2B84B"],["dip","#C98A5A"],["wind","#A88A3A"],["gate","#8E7CC3"]].forEach(z=>put(300,A.zones[z[0]],78,z[1],16,lg));
-  [-1,0,1].forEach(k=>{const t=A.di*24+A.L+24*k-lg;if(t<D0||t>=D0+24)return;const p=pt(300,78,t-D0);h+=`<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#0E1320" stroke="#F2B84B" stroke-width="2.5"/>`});
+  [-1,0,1].forEach(k=>{const t=A.di*24+A.L+24*k;if(t<T||t>=T+12)return;const p=pt(300,78,t-lg);h+=`<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#0E1320" stroke="#F2B84B" stroke-width="2.5"/>`});
+  const sl=A.sleeps.find(x=>T>=x[0]&&T<x[1]),ns=A.sleeps.filter(x=>x[0]>T).sort((p,q)=>p[0]-q[0])[0];
+  $("slp").textContent=sl?"SLEEP NOW TILL "+fmt(sl[1]):ns?"SLEEP "+fmt(ns[0])+" TO "+fmt(ns[1]):"";
   $("rings").innerHTML=h}
 function status(A){const T=A.T,zn=Object.keys(A.zones).find(k=>has(A.zones[k],T)),sl=A.sleeps.find(s=>T>=s[0]&&T<s[1]),onDuty=has(A.dutyI,T);
   let head,subt,cls="";
@@ -193,20 +199,18 @@ let viewT=null,first=true,timer=0;
 const RM=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 function render(){const T=viewT===null?absOf(realNow()):viewT,A=analyse(T);
   drawRings(A);status(A);drawDays(A);
-  const wd=mod(T,24)/24*360,bd=wd-A.r.dir*A.r.h/24*360,bodyT=T-A.r.dir*A.r.h;
-  $("cw").textContent=fmt(T);$("cb").textContent=fmt(bodyT);$("lag").textContent=A.r.dir?"BODY IS "+A.r.h.toFixed(1)+" H "+(A.r.dir>0?"BEHIND":"AHEAD"):"BODY IS IN STEP";$("scrub").value=String(Math.round(mod(T,24)*6)*10);
-  $("wh").style.transform="rotate("+wd+"deg)";
+  const bodyT=T-(A.L-4),hA=x=>mod(x,12)/12*360,mA=x=>mod(x,1)*360,rot=(id,d)=>{$(id).style.transform="rotate("+d+"deg)"};
+  $("cw").textContent=fmt(T);$("cb").textContent=fmt(bodyT);$("lag").textContent=A.r.dir?A.r.h.toFixed(1)+" H OUT OF STEP":"IN STEP";$("scrub").value=String(Math.round(mod(T,24)*6)*10);
+  rot("whH",hA(T));rot("whM",mA(T));rot("bhM",mA(bodyT));
   $("dial").setAttribute("aria-label","Wall time "+fmt(T)+", body time "+fmt(bodyT)+", body low point "+fmt(A.L));
   $("bNow").disabled=viewT===null;$("example").hidden=saved;
-  if(first&&!RM){first=false;$("bh").style.transform="rotate("+wd+"deg)";requestAnimationFrame(()=>requestAnimationFrame(()=>{$("bh").classList.add("sweep");$("bh").style.transform="rotate("+bd+"deg)";setTimeout(()=>$("bh").classList.remove("sweep"),700)}))}
-  else{first=false;$("bh").style.transform="rotate("+bd+"deg)"}}
+  if(first&&!RM){first=false;rot("bhH",hA(T));requestAnimationFrame(()=>requestAnimationFrame(()=>{$("bhH").classList.add("sweep");rot("bhH",hA(bodyT));setTimeout(()=>$("bhH").classList.remove("sweep"),700)}))}
+  else{first=false;rot("bhH",hA(bodyT))}}
 function schedule(){clearTimeout(timer);if(document.hidden)return;timer=setTimeout(()=>{if(viewT===null)render();schedule()},(60-new Date().getSeconds())*1000+60)}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&viewT===null)render();schedule()});
 const setHour=h=>{const base=viewT===null?absOf(realNow()):viewT;viewT=Math.floor(base/24)*24+h;render()};
 $("scrub").addEventListener("input",e=>setHour(parseInt(e.target.value,10)/60));
 $("bNow").onclick=()=>{viewT=null;render()};
-$("dial").addEventListener("click",e=>{const b=$("dial").getBoundingClientRect(),sx=(e.clientX-b.left)/b.width*400,sy=(e.clientY-b.top)/b.height*300,R=sx>=200;if(sy>215)return;
-  let hr=mod(Math.atan2(sx-(R?300:100),CY-sy)/(2*Math.PI)*24,24);if(R){const A=analyse(viewT===null?absOf(realNow()):viewT);hr=mod(hr+A.r.dir*A.r.h,24)}setHour(Math.round(hr*6)/6%24)});
 $("days").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const base=viewT===null?absOf(realNow()):viewT;
   if(b.id==="pw")viewT=base-168;else if(b.id==="nw")viewT=base+168;else viewT=parseInt(b.dataset.d,10)*24+mod(base,24);render()});
 document.addEventListener("keydown",e=>{if(e.target&&/^(INPUT|SELECT|BUTTON|SUMMARY)$/.test(e.target.tagName))return;const base=viewT===null?absOf(realNow()):viewT;
